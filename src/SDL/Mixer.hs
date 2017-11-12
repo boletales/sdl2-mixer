@@ -215,20 +215,16 @@ initialize flags = do
 data InitFlag
   = InitFLAC
   | InitMOD
-  | InitMODPlug
   | InitMP3
   | InitOGG
-  | InitFluidSynth
   deriving (Eq, Ord, Bounded, Read, Show)
 
 initToCInt :: InitFlag -> CInt
 initToCInt = \case
   InitFLAC       -> SDL.Raw.Mixer.INIT_FLAC
   InitMOD        -> SDL.Raw.Mixer.INIT_MOD
-  InitMODPlug    -> SDL.Raw.Mixer.INIT_MODPLUG
   InitMP3        -> SDL.Raw.Mixer.INIT_MP3
   InitOGG        -> SDL.Raw.Mixer.INIT_OGG
-  InitFluidSynth -> SDL.Raw.Mixer.INIT_FLUIDSYNTH
 
 -- | Cleans up any loaded libraries, freeing memory.
 quit :: MonadIO m => m ()
@@ -978,9 +974,7 @@ data MusicType
   | MID
   | OGG
   | MP3
-  | MP3_MAD
   | FLAC
-  | MODPlug
   deriving (Eq, Show, Read, Ord, Bounded)
 
 wordToMusicType :: SDL.Raw.Mixer.MusicType -> Maybe MusicType
@@ -992,9 +986,7 @@ wordToMusicType = \case
   SDL.Raw.Mixer.MUS_MID     -> Just MID
   SDL.Raw.Mixer.MUS_OGG     -> Just OGG
   SDL.Raw.Mixer.MUS_MP3     -> Just MP3
-  SDL.Raw.Mixer.MUS_MP3_MAD -> Just MP3_MAD
   SDL.Raw.Mixer.MUS_FLAC    -> Just FLAC
-  SDL.Raw.Mixer.MUS_MODPLUG -> Just MODPlug
   _                         -> Nothing
 
 -- | Gets the 'MusicType' of a given 'Music'.
