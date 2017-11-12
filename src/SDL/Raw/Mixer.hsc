@@ -28,10 +28,8 @@ module SDL.Raw.Mixer
   , init
   , pattern INIT_FLAC
   , pattern INIT_MOD
-  , pattern INIT_MODPLUG
   , pattern INIT_MP3
   , pattern INIT_OGG
-  , pattern INIT_FLUIDSYNTH
   , quit
   , Format
   , pattern DEFAULT_FORMAT
@@ -131,9 +129,7 @@ module SDL.Raw.Mixer
   , pattern MUS_MID
   , pattern MUS_OGG
   , pattern MUS_MP3
-  , pattern MUS_MP3_MAD
   , pattern MUS_FLAC
-  , pattern MUS_MODPLUG
   , playingMusic
   , pausedMusic
   , fadingMusic
@@ -193,10 +189,8 @@ liftF "init" "Mix_Init"
 
 pattern INIT_FLAC       = (#const MIX_INIT_FLAC)
 pattern INIT_MOD        = (#const MIX_INIT_MOD)
-pattern INIT_MODPLUG    = (#const MIX_INIT_MODPLUG)
 pattern INIT_MP3        = (#const MIX_INIT_MP3)
 pattern INIT_OGG        = (#const MIX_INIT_OGG)
-pattern INIT_FLUIDSYNTH = (#const MIX_INIT_FLUIDSYNTH)
 
 liftF "quit" "Mix_Quit"
   [t|IO ()|]
@@ -401,9 +395,7 @@ pattern MUS_MOD     = (#const MUS_MOD)
 pattern MUS_MID     = (#const MUS_MID)
 pattern MUS_OGG     = (#const MUS_OGG)
 pattern MUS_MP3     = (#const MUS_MP3)
-pattern MUS_MP3_MAD = (#const MUS_MP3_MAD)
 pattern MUS_FLAC    = (#const MUS_FLAC)
-pattern MUS_MODPLUG = (#const MUS_MODPLUG)
 
 liftF "freeMusic" "Mix_FreeMusic"
   [t|Ptr Music -> IO ()|]
