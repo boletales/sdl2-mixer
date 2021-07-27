@@ -9,6 +9,7 @@ inlined MonadIO variant. Use this to simplify the package's SDL.Raw.* modules.
 -}
 
 {-# LANGUAGE BangPatterns    #-}
+{-# LANGUAGE CPP             #-}
 {-# LANGUAGE LambdaCase      #-}
 {-# LANGUAGE TemplateHaskell #-}
 
@@ -78,7 +79,11 @@ liftType = \case
     m <- newName "m"
     return $
       ForallT
+#if MIN_VERSION_template_haskell(2,17,0)
+        [PlainTV m SpecifiedSpec]
+#else
         [PlainTV m]
+#endif
         [AppT (ConT ''MonadIO) $ VarT m]
         (AppT (VarT m) t)
   t -> return t
