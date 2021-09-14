@@ -1,5 +1,5 @@
 name:                sdl2-mixer
-version:             1.2.0
+version:             1.2.0.0
 git:                 https://gitlab.homotopic.tech/haskell/sdl2-mixer
 bug-reports:         https://gitlab.homotopic.tech/haskell/sdl2-mixer/issues
 license:             BSD-3-Clause

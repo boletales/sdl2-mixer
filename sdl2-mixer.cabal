@@ -5,7 +5,7 @@ cabal-version: 2.2
 -- see: https://github.com/sol/hpack
 
 name:           sdl2-mixer
-version:        1.2.0
+version:        1.2.0.0
 synopsis:       Haskell bindings to SDL2_mixer
 category:       Sound, Foreign
 bug-reports:    https://gitlab.homotopic.tech/haskell/sdl2-mixer/issues
