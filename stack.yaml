@@ -1,2 +1,4 @@
-resolver: lts-7.18
-system-ghc: true
+resolver: nightly-2021-09-10
+nix:
+  enable: false
+  packages: [pkg-config, SDL2, SDL2_mixer]
