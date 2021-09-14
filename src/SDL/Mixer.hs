@@ -1,3 +1,4 @@
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
@@ -176,10 +177,9 @@ import Control.Monad (forM, void, when, (<=<), (>=>))
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl)
 import Data.Bits ((.&.), (.|.))
-import Data.ByteString (ByteString, readFile)
+import Data.ByteString as BS (ByteString, readFile)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Default.Class (Default (def))
-import Data.Foldable (foldl)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Int (Int16)
 import Data.Vector.Storable.Mutable (IOVector, unsafeFromForeignPtr0)
@@ -189,14 +189,20 @@ import Foreign.C.Types (CInt)
 import Foreign.ForeignPtr (castForeignPtr, newForeignPtr_)
 import Foreign.Marshal.Alloc (alloca)
 import Foreign.Ptr (FunPtr, Ptr, castPtr, freeHaskellFunPtr, nullFunPtr, nullPtr)
-import Foreign.Storable (Storable (..))
+import Foreign.Storable (Storable (peek))
 import SDL (SDLException (SDLCallFailed))
 import SDL.Internal.Exception
+  ( getError,
+    throwIf0,
+    throwIfNeg,
+    throwIfNeg_,
+    throwIfNull,
+    throwIf_,
+  )
 import qualified SDL.Raw
 import SDL.Raw.Filesystem (rwFromConstMem)
 import qualified SDL.Raw.Mixer
 import System.IO.Unsafe (unsafePerformIO)
-import Prelude hiding (foldl, readFile)
 
 -- | Initialize the library by loading support for a certain set of
 -- sample/music formats.
@@ -219,7 +225,7 @@ data InitFlag
   | InitMOD
   | InitMP3
   | InitOGG
-  deriving (Eq, Ord, Bounded, Read, Show)
+  deriving stock (Eq, Ord, Bounded, Read, Show)
 
 initToCInt :: InitFlag -> CInt
 initToCInt = \case
@@ -273,7 +279,7 @@ data Audio = Audio
     -- | 'Mono' or 'Stereo' output.
     audioOutput :: Output
   }
-  deriving (Eq, Read, Show)
+  deriving stock (Eq, Read, Show)
 
 instance Default Audio where
   def =
@@ -317,7 +323,7 @@ data Format
     FormatU16_Sys
   | -- | Signed 16-bit samples, in system byte order.
     FormatS16_Sys
-  deriving (Eq, Ord, Bounded, Read, Show)
+  deriving stock (Eq, Ord, Bounded, Read, Show)
 
 formatToWord :: Format -> SDL.Raw.Mixer.Format
 formatToWord = \case
@@ -344,7 +350,7 @@ wordToFormat = \case
 
 -- | The number of sound channels in output.
 data Output = Mono | Stereo
-  deriving (Eq, Ord, Bounded, Read, Show)
+  deriving stock (Eq, Ord, Bounded, Read, Show)
 
 outputToCInt :: Output -> CInt
 outputToCInt = \case
@@ -394,7 +400,7 @@ class Loadable a where
 
   -- | Same as 'decode', but loads from a file instead.
   load :: MonadIO m => FilePath -> m a
-  load = decode <=< (liftIO . readFile)
+  load = decode <=< (liftIO . BS.readFile)
 
   -- | Frees the value's memory. It should no longer be used.
   --
@@ -442,7 +448,8 @@ chunkDecoders =
     forM [0 .. num - 1] $ SDL.Raw.Mixer.getChunkDecoder >=> peekCString
 
 -- | A loaded audio chunk.
-newtype Chunk = Chunk (Ptr SDL.Raw.Mixer.Chunk) deriving (Eq, Show)
+newtype Chunk = Chunk (Ptr SDL.Raw.Mixer.Chunk)
+  deriving stock (Eq, Show)
 
 instance Loadable Chunk where
   decode bytes = liftIO $ do
@@ -468,7 +475,9 @@ instance HasVolume Chunk where
 -- 'setChannels'.
 --
 -- The starting 'Volume' of each 'Channel' is the maximum: 128.
-newtype Channel = Channel CInt deriving (Eq, Ord, Enum, Integral, Real, Num)
+newtype Channel = Channel CInt
+  deriving stock (Eq, Ord)
+  deriving newtype (Enum, Integral, Real, Num)
 
 instance Show Channel where
   show = \case
@@ -539,7 +548,9 @@ playForever :: MonadIO m => Chunk -> m ()
 playForever = void . playOn (-1) Forever
 
 -- | How many times should a certain 'Chunk' be played?
-newtype Times = Times CInt deriving (Eq, Ord, Enum, Integral, Real, Num)
+newtype Times = Times CInt
+  deriving stock (Eq, Ord)
+  deriving newtype (Enum, Integral, Real, Num)
 
 -- | A shorthand for playing once.
 pattern Once :: Times
@@ -730,7 +741,7 @@ pausedCount = fromIntegral <$> SDL.Raw.Mixer.paused (-1)
 
 -- | Describes whether a 'Channel' is fading in, out, or not at all.
 data Fading = NoFading | FadingIn | FadingOut
-  deriving (Eq, Ord, Show, Read)
+  deriving stock (Eq, Ord, Show, Read)
 
 wordToFading :: SDL.Raw.Mixer.Fading -> Fading
 wordToFading = \case
@@ -753,7 +764,9 @@ fading (Channel c) =
 -- them at once.
 --
 -- By default, all 'Channel's are members of the 'DefaultGroup'.
-newtype Group = Group CInt deriving (Eq, Ord, Enum, Integral, Real, Num)
+newtype Group = Group CInt
+  deriving stock (Eq, Ord)
+  deriving newtype (Enum, Integral, Real, Num)
 
 -- | The default 'Group' all 'Channel's are in the moment they are created.
 pattern DefaultGroup :: Group
@@ -852,7 +865,8 @@ musicDecoders =
 --
 -- To manipulate 'Music' outside of post-processing callbacks, use the music
 -- variant functions listed below.
-newtype Music = Music (Ptr SDL.Raw.Mixer.Music) deriving (Eq, Show)
+newtype Music = Music (Ptr SDL.Raw.Mixer.Music)
+  deriving stock (Eq, Show)
 
 instance Loadable Music where
   decode bytes = liftIO $ do
@@ -1011,7 +1025,7 @@ data MusicType
   | OGG
   | MP3
   | FLAC
-  deriving (Eq, Show, Read, Ord, Bounded)
+  deriving stock (Eq, Show, Read, Ord, Bounded)
 
 wordToMusicType :: SDL.Raw.Mixer.MusicType -> Maybe MusicType
 wordToMusicType = \case

@@ -15,6 +15,28 @@ module SDL.Raw.Helper (liftF) where
 import Control.Monad (replicateM)
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Language.Haskell.TH
+  ( Body (NormalB),
+    Callconv (CCall),
+    Clause (Clause),
+    Dec (ForeignD, FunD, PragmaD, SigD),
+    Exp (AppE, VarE),
+    Foreign (ImportF),
+    Inline (Inline),
+    Name,
+    Pat (VarP),
+    Phases (AllPhases),
+    Pragma (InlineP),
+    Q,
+    RuleMatch (FunLike),
+    Safety (Safe),
+    TyVarBndr (PlainTV),
+    Type (AppT, ArrowT, ConT, ForallT, SigT, VarT),
+    mkName,
+    newName,
+#if MIN_VERSION_template_haskell(2,17,0)
+    Specificity(SpecifiedSpec)
+#endif
+  )
 
 -- | Given a name @fname@, a name of a C function @cname@ and the desired
 -- Haskell type @ftype@, this function generates:
@@ -57,6 +79,7 @@ liftF fname cname ftype = do
 countArgs :: Type -> Int
 countArgs = count 0
   where
+    count :: Num p => p -> Type -> p
     count !n = \case
       (AppT (AppT ArrowT _) t) -> count (n + 1) t
       (ForallT _ _ t) -> count n t
@@ -68,6 +91,7 @@ applyTo :: Name -> [Exp] -> Exp
 applyTo f [] = VarE f
 applyTo f es = loop (tail es) . AppE (VarE f) $ head es
   where
+    loop :: Foldable t => t Exp -> Exp -> Exp
     loop as e = foldl AppE e as
 
 -- | Fuzzily speaking, converts a given IO type into a MonadIO m one.

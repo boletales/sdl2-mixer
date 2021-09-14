@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version: 2.2
 
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
@@ -17,7 +17,7 @@ maintainer:     Siniša Biđin <sinisa@bidin.eu>,
 copyright:      2015 Vladimir Semyonov,
                 2015 Siniša Biđin,
                 2021 Daniel Firth
-license:        MIT
+license:        BSD-3-Clause
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:

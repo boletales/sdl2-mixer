@@ -2,7 +2,7 @@ name:                sdl2-mixer
 version:             1.2.0
 git:                 https://gitlab.homotopic.tech/haskell/sdl2-mixer
 bug-reports:         https://gitlab.homotopic.tech/haskell/sdl2-mixer/issues
-license:             MIT
+license:             BSD-3-Clause
 author:
 - Vladimir Semyonov
 - Siniša Biđin

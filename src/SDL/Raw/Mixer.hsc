@@ -11,7 +11,12 @@ documentation.
 -}
 
 {-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+{-# OPTIONS_GHC -fno-warn-missing-exported-signatures #-}
+{-# OPTIONS_GHC -fno-warn-missing-import-lists #-}
+{-# OPTIONS_GHC -fno-warn-missing-local-signatures #-}
+{-# OPTIONS_GHC -fno-warn-missing-pattern-synonym-signatures #-}
 
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -46,8 +51,7 @@ module SDL.Raw.Mixer
   , pattern AUDIO_S16
   , pattern AUDIO_U16SYS
   , pattern AUDIO_S16SYS
-  , closeAudio
-  , querySpec
+  , closeAudio , querySpec
 
   -- * Samples
   , getNumChunkDecoders
@@ -234,7 +238,7 @@ data Chunk = Chunk
   , chunkAbuf      :: Ptr Word8
   , chunkAlen      :: Word32
   , chunkVolume    :: Word8
-  } deriving (Eq, Show)
+  } deriving stock (Eq, Show)
 
 instance Storable Chunk where
   alignment = sizeOf

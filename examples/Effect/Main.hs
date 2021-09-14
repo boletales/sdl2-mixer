@@ -1,14 +1,11 @@
-module Main where
-
-import Data.Int           (Int16)
-import Data.Word          (Word8)
-import Control.Monad      (when, forM_)
-import System.Environment (getArgs)
-import System.Exit        (exitFailure)
-
+import Control.Monad (forM_, when)
+import Data.Int (Int16)
+import qualified Data.Vector.Storable.Mutable as MV
+import Data.Word (Word8)
 import qualified SDL
 import qualified SDL.Mixer as Mix
-import qualified Data.Vector.Storable.Mutable as MV
+import System.Environment (getArgs)
+import System.Exit (exitFailure)
 
 main :: IO ()
 main = do
@@ -36,12 +33,12 @@ halveVolume bytes = do
 -- Apply an Effect on the Music being played.
 runExample :: FilePath -> IO ()
 runExample path = do
-
   -- Add effects, get back effect removal actions.
   -- The volume should be FOUR times as low after this.
   popEffects <-
-    mapM (Mix.effect Mix.PostProcessing (\_ -> return ()) . const)
-         [halveVolume, halveVolume]
+    mapM
+      (Mix.effect Mix.PostProcessing (\_ -> return ()) . const)
+      [halveVolume, halveVolume]
 
   -- Then give the left channel louder music than the right one.
   popPan <- Mix.effectPan Mix.PostProcessing 128 64
