@@ -184,8 +184,7 @@ import Foreign.C.String (peekCString)
 import Foreign.C.Types (CInt)
 import Foreign.ForeignPtr (newForeignPtr_, castForeignPtr)
 import Foreign.Marshal.Alloc (alloca)
-import Foreign.Ptr (FunPtr, nullFunPtr, freeHaskellFunPtr)
-import Foreign.Ptr (Ptr, castPtr, nullPtr)
+import Foreign.Ptr (Ptr, castPtr, nullPtr, FunPtr, nullFunPtr, freeHaskellFunPtr)
 import Foreign.Storable (Storable(..))
 import Prelude hiding (foldl, readFile)
 import SDL (SDLException(SDLCallFailed))
@@ -254,7 +253,7 @@ withAudio conf csize act = do
 -- 'closeAudio' after a computation ends, so you have to take care to do so
 -- manually.
 openAudio :: MonadIO m => Audio -> ChunkSize -> m ()
-openAudio (Audio {..}) chunkSize =
+openAudio Audio {..} chunkSize =
   throwIfNeg_ "SDL.Mixer.openAudio" "Mix_OpenAudio" $
     SDL.Raw.Mixer.openAudio
       (fromIntegral audioFrequency)
@@ -378,7 +377,7 @@ class Loadable a where
 
   -- | Same as 'decode', but loads from a file instead.
   load :: MonadIO m => FilePath -> m a
-  load = (decode =<<) . liftIO . readFile
+  load = decode <=< (liftIO . readFile)
 
   -- | Frees the value's memory. It should no longer be used.
   --
@@ -424,8 +423,7 @@ chunkDecoders :: MonadIO m => m [String]
 chunkDecoders =
   liftIO $ do
     num <- SDL.Raw.Mixer.getNumChunkDecoders
-    forM [0 .. num - 1] $ \i ->
-      SDL.Raw.Mixer.getChunkDecoder i >>= peekCString
+    forM [0 .. num - 1] $ SDL.Raw.Mixer.getChunkDecoder >=> peekCString
 
 -- | A loaded audio chunk.
 newtype Chunk = Chunk (Ptr SDL.Raw.Mixer.Chunk) deriving (Eq, Show)
@@ -441,7 +439,7 @@ instance Loadable Chunk where
   free (Chunk p) = liftIO $ SDL.Raw.Mixer.freeChunk p
 
 instance HasVolume Chunk where
-  getVolume   (Chunk p) = fmap fromIntegral $ SDL.Raw.Mixer.volumeChunk p (-1)
+  getVolume   (Chunk p) = fromIntegral <$> SDL.Raw.Mixer.volumeChunk p (-1)
   setVolume v (Chunk p) = void . SDL.Raw.Mixer.volumeChunk p $ volumeToCInt v
 
 -- | A mixing channel.
@@ -514,7 +512,7 @@ instance HasVolume Channel where
   setVolume v (Channel c) =
     void . SDL.Raw.Mixer.volume (clipChan c) $ volumeToCInt v
   getVolume (Channel c) =
-    fmap fromIntegral $ SDL.Raw.Mixer.volume (clipChan c) (-1)
+    fromIntegral <$> SDL.Raw.Mixer.volume (clipChan c) (-1)
 
 -- | Play a 'Chunk' once, using the first available 'Channel'.
 play :: MonadIO m => Chunk -> m ()
@@ -563,10 +561,10 @@ pattern NoLimit = -1
 -- This is the most generic play function variant.
 playLimit :: MonadIO m => Limit -> Channel -> Times -> Chunk -> m Channel
 playLimit l (Channel c) (Times t) (Chunk p) =
-  throwIfNeg "SDL.Mixer.playLimit" "Mix_PlayChannelTimed" $
-    fmap fromIntegral $
+  throwIfNeg "SDL.Mixer.playLimit" "Mix_PlayChannelTimed" 
+    (fromIntegral <$>
       SDL.Raw.Mixer.playChannelTimed
-        (clipChan c) p (max (-1) $ t - 1) (fromIntegral l)
+        (clipChan c) p (max (-1) $ t - 1) (fromIntegral l))
 
 -- | Same as 'play', but fades in the 'Chunk' by making the 'Channel' 'Volume'
 -- start at 0 and rise to a full 128 over the course of a given number of
@@ -817,8 +815,7 @@ musicDecoders :: MonadIO m => m [String]
 musicDecoders =
   liftIO $ do
     num <- SDL.Raw.Mixer.getNumMusicDecoders
-    forM [0 .. num - 1] $ \i ->
-      SDL.Raw.Mixer.getMusicDecoder i >>= peekCString
+    forM [0 .. num - 1] $ SDL.Raw.Mixer.getMusicDecoder >=> peekCString
 
 -- | A loaded music file.
 --
@@ -963,7 +960,7 @@ fadingMusic = wordToFading <$> SDL.Raw.Mixer.fadingMusic
 
 -- | Gets the current 'Volume' setting for 'Music'.
 getMusicVolume :: MonadIO m => m Volume
-getMusicVolume = fmap fromIntegral $ SDL.Raw.Mixer.volumeMusic (-1)
+getMusicVolume = fromIntegral <$> SDL.Raw.Mixer.volumeMusic (-1)
 
 -- | Sets the 'Volume' for 'Music'.
 --
