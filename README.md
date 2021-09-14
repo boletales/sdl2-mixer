@@ -1,7 +1,7 @@
 # sdl2-mixer
 
 [![Hackage](https://img.shields.io/hackage/v/sdl2-mixer.svg)](https://hackage.haskell.org/package/sdl2-mixer)
-[![GitLab](https://img.shields.io/h/gitlab/pipeline/haskell/sdl2-mixer/master+?gitlab_url=https%3A%2F%2Fgitlab.homotopic.tech)](https://gitlab.homotopic.tech/haskell/sdl2-mixer)
+[![GitLab](https://gitlab.homotopic.tech/haskell/sdl2-mixer/badges/master/pipeline.svg)](https://gitlab.homotopic.tech/haskell/sdl2-mixer)
 
 
 #### Haskell bindings to SDL2_mixer
