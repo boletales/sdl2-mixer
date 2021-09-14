@@ -1,22 +1,19 @@
-{-|
-
-Module  : SDL.Raw.Helper
-License : BSD3
-
-Exposes a way to automatically generate a foreign import alongside its lifted,
-inlined MonadIO variant. Use this to simplify the package's SDL.Raw.* modules.
-
--}
-
-{-# LANGUAGE BangPatterns    #-}
-{-# LANGUAGE CPP             #-}
-{-# LANGUAGE LambdaCase      #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TemplateHaskell #-}
 
+-- |
+--
+-- Module  : SDL.Raw.Helper
+-- License : BSD3
+--
+-- Exposes a way to automatically generate a foreign import alongside its lifted,
+-- inlined MonadIO variant. Use this to simplify the package's SDL.Raw.* modules.
 module SDL.Raw.Helper (liftF) where
 
-import Control.Monad           (replicateM)
-import Control.Monad.IO.Class  (MonadIO, liftIO)
+import Control.Monad (replicateM)
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import Language.Haskell.TH
 
 -- | Given a name @fname@, a name of a C function @cname@ and the desired
@@ -27,8 +24,8 @@ import Language.Haskell.TH
 liftF :: String -> String -> Q Type -> Q [Dec]
 liftF fname cname ftype = do
   let f' = mkName $ fname ++ "'" -- Direct binding.
-  let f  = mkName fname          -- Lifted.
-  t' <- ftype                    -- Type of direct binding.
+  let f = mkName fname -- Lifted.
+  t' <- ftype -- Type of direct binding.
 
   -- The generated function accepts n arguments.
   args <- replicateM (countArgs t') $ newName "x"
@@ -37,33 +34,34 @@ liftF fname cname ftype = do
   -- However, this fails to typecheck without an explicit type signature.
   -- Therefore, we include one. TODO: Can we get rid of this?
   sigd <- case args of
-            [] -> ((:[]) . SigD f) `fmap` liftType t'
-            _  -> return []
+    [] -> ((: []) . SigD f) `fmap` liftType t'
+    _ -> return []
 
-  return $ concat
-    [
-      [ ForeignD $ ImportF CCall Safe cname f' t'
-      , PragmaD $ InlineP f Inline FunLike AllPhases
-      ]
-    , sigd
-    , [ FunD f
-        [ Clause
-            (map VarP args)
-            (NormalB $ 'liftIO `applyTo` [f' `applyTo` map VarE args])
-            []
+  return $
+    concat
+      [ [ ForeignD $ ImportF CCall Safe cname f' t',
+          PragmaD $ InlineP f Inline FunLike AllPhases
+        ],
+        sigd,
+        [ FunD
+            f
+            [ Clause
+                (map VarP args)
+                (NormalB $ 'liftIO `applyTo` [f' `applyTo` map VarE args])
+                []
+            ]
         ]
       ]
-    ]
 
 -- | How many arguments does a function of a given type take?
 countArgs :: Type -> Int
 countArgs = count 0
   where
     count !n = \case
-      (AppT (AppT ArrowT _) t) -> count (n+1) t
+      (AppT (AppT ArrowT _) t) -> count (n + 1) t
       (ForallT _ _ t) -> count n t
-      (SigT t _)      -> count n t
-      _               -> n
+      (SigT t _) -> count n t
+      _ -> n
 
 -- | An expression where f is applied to n arguments.
 applyTo :: Name -> [Exp] -> Exp

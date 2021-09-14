@@ -1,180 +1,184 @@
-{-|
-
-Module      : SDL.Mixer
-License     : BSD3
-Stability   : experimental
-
-Bindings to the @SDL2_mixer@ library.
-
--}
-
-{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase                 #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE PatternSynonyms            #-}
-{-# LANGUAGE RecordWildCards            #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PatternSynonyms #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
 
+-- |
+--
+-- Module      : SDL.Mixer
+-- License     : BSD3
+-- Stability   : experimental
+--
+-- Bindings to the @SDL2_mixer@ library.
 module SDL.Mixer
-  (
-  -- * Audio setup
-  --
-  -- | In order to use the rest of the library, you need to
-  -- supply 'withAudio' or 'openAudio' with an 'Audio' configuration.
-    withAudio
-  , Audio(..)
-  , Format(..)
-  , Output(..)
-  , defaultAudio
-  , ChunkSize
-  , queryAudio
+  ( -- * Audio setup
 
-  -- ** Alternative
-  , openAudio
-  , closeAudio
+    --
 
-  -- * Loading audio data
-  --
-  -- | Use 'load' or 'decode' to get both 'Chunk' and 'Music' values.
-  , Loadable(..)
-  , Chunk(..)
-  , chunkDecoders
-  , Music(..)
-  , musicDecoders
+    -- | In order to use the rest of the library, you need to
+    -- supply 'withAudio' or 'openAudio' with an 'Audio' configuration.
+    withAudio,
+    Audio (..),
+    Format (..),
+    Output (..),
+    defaultAudio,
+    ChunkSize,
+    queryAudio,
 
-  -- * Chunks
-  --
-  -- | 'Chunk's are played on 'Channel's, which can be combined into 'Group's.
+    -- ** Alternative
+    openAudio,
+    closeAudio,
 
-  -- ** Playing chunks
-  , Channel
-  , pattern AllChannels
-  , setChannels
-  , getChannels
-  , play
-  , playForever
-  , Times
-  , pattern Once
-  , pattern Forever
-  , playOn
-  , Milliseconds
-  , Limit
-  , pattern NoLimit
-  , playLimit
-  , fadeIn
-  , fadeInOn
-  , fadeInLimit
+    -- * Loading audio data
 
-  -- ** Grouping channels
-  , reserveChannels
-  , Group
-  , pattern DefaultGroup
-  , group
-  , groupSpan
-  , groupCount
-  , getAvailable
-  , getOldest
-  , getNewest
+    --
 
-  -- ** Controlling playback
-  , pause
-  , resume
-  , halt
-  , haltAfter
-  , haltGroup
+    -- | Use 'load' or 'decode' to get both 'Chunk' and 'Music' values.
+    Loadable (..),
+    Chunk (..),
+    chunkDecoders,
+    Music (..),
+    musicDecoders,
 
-  -- ** Setting the volume
-  , Volume
-  , HasVolume(..)
+    -- * Chunks
 
-  -- ** Querying for status
-  , playing
-  , playingCount
-  , paused
-  , pausedCount
-  , playedLast
-  , Fading
-  , fading
+    --
 
-  -- ** Fading out
-  , fadeOut
-  , fadeOutGroup
+    -- | 'Chunk's are played on 'Channel's, which can be combined into 'Group's.
 
-  -- ** Reacting to finish
-  , whenChannelFinished
+    -- ** Playing chunks
+    Channel,
+    pattern AllChannels,
+    setChannels,
+    getChannels,
+    play,
+    playForever,
+    Times,
+    pattern Once,
+    pattern Forever,
+    playOn,
+    Milliseconds,
+    Limit,
+    pattern NoLimit,
+    playLimit,
+    fadeIn,
+    fadeInOn,
+    fadeInLimit,
 
-  -- * Music
-  --
-  -- | 'Chunk's and 'Music' differ by the way they are played. While multiple
-  -- 'Chunk's can be played on different desired 'Channel's at the same time,
-  -- there can only be one 'Music' playing at the same time.
-  --
-  -- Therefore, the functions used for 'Music' are separate.
+    -- ** Grouping channels
+    reserveChannels,
+    Group,
+    pattern DefaultGroup,
+    group,
+    groupSpan,
+    groupCount,
+    getAvailable,
+    getOldest,
+    getNewest,
 
-  -- ** Playing music
-  , playMusic
-  , Position
-  , fadeInMusic
-  , fadeInMusicAt
-  , fadeInMusicAtMOD
+    -- ** Controlling playback
+    pause,
+    resume,
+    halt,
+    haltAfter,
+    haltGroup,
 
-  -- ** Controlling playback
-  , pauseMusic
-  , haltMusic
-  , resumeMusic
-  , rewindMusic
-  , setMusicPosition
-  , setMusicPositionMOD
+    -- ** Setting the volume
+    Volume,
+    HasVolume (..),
 
-  -- ** Setting the volume
-  , setMusicVolume
-  , getMusicVolume
+    -- ** Querying for status
+    playing,
+    playingCount,
+    paused,
+    pausedCount,
+    playedLast,
+    Fading,
+    fading,
 
-  -- ** Querying for status
-  , playingMusic
-  , pausedMusic
-  , fadingMusic
-  , MusicType(..)
-  , musicType
-  , playingMusicType
+    -- ** Fading out
+    fadeOut,
+    fadeOutGroup,
 
-  -- ** Fading out
-  , fadeOutMusic
+    -- ** Reacting to finish
+    whenChannelFinished,
 
-  -- ** Reacting to finish
-  , whenMusicFinished
+    -- * Music
 
-  -- * Effects
-  , Effect
-  , EffectFinished
-  , pattern PostProcessing
-  , effect
+    --
 
-  -- ** In-built effects
-  , effectPan
-  , effectDistance
-  , effectPosition
-  , effectReverseStereo
+    -- | 'Chunk's and 'Music' differ by the way they are played. While multiple
+    -- 'Chunk's can be played on different desired 'Channel's at the same time,
+    -- there can only be one 'Music' playing at the same time.
+    --
+    -- Therefore, the functions used for 'Music' are separate.
 
-  -- * Other
-  , initialize
-  , InitFlag(..)
-  , quit
-  , version
+    -- ** Playing music
+    playMusic,
+    Position,
+    fadeInMusic,
+    fadeInMusicAt,
+    fadeInMusicAtMOD,
 
-  ) where
+    -- ** Controlling playback
+    pauseMusic,
+    haltMusic,
+    resumeMusic,
+    rewindMusic,
+    setMusicPosition,
+    setMusicPositionMOD,
+
+    -- ** Setting the volume
+    setMusicVolume,
+    getMusicVolume,
+
+    -- ** Querying for status
+    playingMusic,
+    pausedMusic,
+    fadingMusic,
+    MusicType (..),
+    musicType,
+    playingMusicType,
+
+    -- ** Fading out
+    fadeOutMusic,
+
+    -- ** Reacting to finish
+    whenMusicFinished,
+
+    -- * Effects
+    Effect,
+    EffectFinished,
+    pattern PostProcessing,
+    effect,
+
+    -- ** In-built effects
+    effectPan,
+    effectDistance,
+    effectPosition,
+    effectReverseStereo,
+
+    -- * Other
+    initialize,
+    InitFlag (..),
+    quit,
+    version,
+  )
+where
 
 import Control.Exception (throwIO)
 import Control.Exception.Lifted (finally)
-import Control.Monad (void, forM, when)
+import Control.Monad (forM, void, when, (<=<), (>=>))
 import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Trans.Control (MonadBaseControl)
-import Data.Bits ((.|.), (.&.))
+import Data.Bits ((.&.), (.|.))
 import Data.ByteString (ByteString, readFile)
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.Default.Class (Default(def))
+import Data.Default.Class (Default (def))
 import Data.Foldable (foldl)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Int (Int16)
@@ -182,18 +186,17 @@ import Data.Vector.Storable.Mutable (IOVector, unsafeFromForeignPtr0)
 import Data.Word (Word8)
 import Foreign.C.String (peekCString)
 import Foreign.C.Types (CInt)
-import Foreign.ForeignPtr (newForeignPtr_, castForeignPtr)
+import Foreign.ForeignPtr (castForeignPtr, newForeignPtr_)
 import Foreign.Marshal.Alloc (alloca)
-import Foreign.Ptr (Ptr, castPtr, nullPtr, FunPtr, nullFunPtr, freeHaskellFunPtr)
-import Foreign.Storable (Storable(..))
-import Prelude hiding (foldl, readFile)
-import SDL (SDLException(SDLCallFailed))
+import Foreign.Ptr (FunPtr, Ptr, castPtr, freeHaskellFunPtr, nullFunPtr, nullPtr)
+import Foreign.Storable (Storable (..))
+import SDL (SDLException (SDLCallFailed))
 import SDL.Internal.Exception
-import SDL.Raw.Filesystem (rwFromConstMem)
-import System.IO.Unsafe (unsafePerformIO)
-
 import qualified SDL.Raw
+import SDL.Raw.Filesystem (rwFromConstMem)
 import qualified SDL.Raw.Mixer
+import System.IO.Unsafe (unsafePerformIO)
+import Prelude hiding (foldl, readFile)
 
 -- | Initialize the library by loading support for a certain set of
 -- sample/music formats.
@@ -220,10 +223,10 @@ data InitFlag
 
 initToCInt :: InitFlag -> CInt
 initToCInt = \case
-  InitFLAC       -> SDL.Raw.Mixer.INIT_FLAC
-  InitMOD        -> SDL.Raw.Mixer.INIT_MOD
-  InitMP3        -> SDL.Raw.Mixer.INIT_MP3
-  InitOGG        -> SDL.Raw.Mixer.INIT_OGG
+  InitFLAC -> SDL.Raw.Mixer.INIT_FLAC
+  InitMOD -> SDL.Raw.Mixer.INIT_MOD
+  InitMP3 -> SDL.Raw.Mixer.INIT_MP3
+  InitOGG -> SDL.Raw.Mixer.INIT_OGG
 
 -- | Cleans up any loaded libraries, freeing memory.
 quit :: MonadIO m => m ()
@@ -241,8 +244,8 @@ version = liftIO $ do
 -- with 'SDL.Init.InitAudio'.
 --
 -- Automatically cleans up the API when the inner computation finishes.
-withAudio
-  :: (MonadBaseControl IO m, MonadIO m) => Audio -> ChunkSize -> m a -> m a
+withAudio ::
+  (MonadBaseControl IO m, MonadIO m) => Audio -> ChunkSize -> m a -> m a
 withAudio conf csize act = do
   openAudio conf csize
   finally act closeAudio
@@ -263,16 +266,22 @@ openAudio Audio {..} chunkSize =
 
 -- | An audio configuration. Use this with 'withAudio'.
 data Audio = Audio
-  { audioFrequency :: Int    -- ^ A sampling frequency.
-  , audioFormat    :: Format -- ^ An output sample format.
-  , audioOutput    :: Output -- ^ 'Mono' or 'Stereo' output.
-  } deriving (Eq, Read, Show)
+  { -- | A sampling frequency.
+    audioFrequency :: Int,
+    -- | An output sample format.
+    audioFormat :: Format,
+    -- | 'Mono' or 'Stereo' output.
+    audioOutput :: Output
+  }
+  deriving (Eq, Read, Show)
 
 instance Default Audio where
-  def = Audio { audioFrequency = SDL.Raw.Mixer.DEFAULT_FREQUENCY
-              , audioFormat    = wordToFormat SDL.Raw.Mixer.DEFAULT_FORMAT
-              , audioOutput    = cIntToOutput SDL.Raw.Mixer.DEFAULT_CHANNELS
-              }
+  def =
+    Audio
+      { audioFrequency = SDL.Raw.Mixer.DEFAULT_FREQUENCY,
+        audioFormat = wordToFormat SDL.Raw.Mixer.DEFAULT_FORMAT,
+        audioOutput = cIntToOutput SDL.Raw.Mixer.DEFAULT_CHANNELS
+      }
 
 -- | A default 'Audio' configuration.
 --
@@ -292,20 +301,28 @@ type ChunkSize = Int
 
 -- | A sample format.
 data Format
-  = FormatU8      -- ^ Unsigned 8-bit samples.
-  | FormatS8      -- ^ Signed 8-bit samples.
-  | FormatU16_LSB -- ^ Unsigned 16-bit samples, in little-endian byte order.
-  | FormatS16_LSB -- ^ Signed 16-bit samples, in little-endian byte order.
-  | FormatU16_MSB -- ^ Unsigned 16-bit samples, in big-endian byte order.
-  | FormatS16_MSB -- ^ signed 16-bit samples, in big-endian byte order.
-  | FormatU16_Sys -- ^ Unsigned 16-bit samples, in system byte order.
-  | FormatS16_Sys -- ^ Signed 16-bit samples, in system byte order.
+  = -- | Unsigned 8-bit samples.
+    FormatU8
+  | -- | Signed 8-bit samples.
+    FormatS8
+  | -- | Unsigned 16-bit samples, in little-endian byte order.
+    FormatU16_LSB
+  | -- | Signed 16-bit samples, in little-endian byte order.
+    FormatS16_LSB
+  | -- | Unsigned 16-bit samples, in big-endian byte order.
+    FormatU16_MSB
+  | -- | signed 16-bit samples, in big-endian byte order.
+    FormatS16_MSB
+  | -- | Unsigned 16-bit samples, in system byte order.
+    FormatU16_Sys
+  | -- | Signed 16-bit samples, in system byte order.
+    FormatS16_Sys
   deriving (Eq, Ord, Bounded, Read, Show)
 
 formatToWord :: Format -> SDL.Raw.Mixer.Format
 formatToWord = \case
-  FormatU8      -> SDL.Raw.Mixer.AUDIO_U8
-  FormatS8      -> SDL.Raw.Mixer.AUDIO_S8
+  FormatU8 -> SDL.Raw.Mixer.AUDIO_U8
+  FormatS8 -> SDL.Raw.Mixer.AUDIO_S8
   FormatU16_LSB -> SDL.Raw.Mixer.AUDIO_U16LSB
   FormatS16_LSB -> SDL.Raw.Mixer.AUDIO_S16LSB
   FormatU16_MSB -> SDL.Raw.Mixer.AUDIO_U16MSB
@@ -315,8 +332,8 @@ formatToWord = \case
 
 wordToFormat :: SDL.Raw.Mixer.Format -> Format
 wordToFormat = \case
-  SDL.Raw.Mixer.AUDIO_U8     -> FormatU8
-  SDL.Raw.Mixer.AUDIO_S8     -> FormatS8
+  SDL.Raw.Mixer.AUDIO_U8 -> FormatU8
+  SDL.Raw.Mixer.AUDIO_S8 -> FormatS8
   SDL.Raw.Mixer.AUDIO_U16LSB -> FormatU16_LSB
   SDL.Raw.Mixer.AUDIO_S16LSB -> FormatS16_LSB
   SDL.Raw.Mixer.AUDIO_U16MSB -> FormatU16_MSB
@@ -331,7 +348,7 @@ data Output = Mono | Stereo
 
 outputToCInt :: Output -> CInt
 outputToCInt = \case
-  Mono   -> 1
+  Mono -> 1
   Stereo -> 2
 
 cIntToOutput :: CInt -> Output
@@ -346,8 +363,9 @@ cIntToOutput = \case
 -- 'withAudio'.
 queryAudio :: MonadIO m => m Audio
 queryAudio =
-  liftIO .
-    alloca $ \freq ->
+  liftIO
+    . alloca
+    $ \freq ->
       alloca $ \form ->
         alloca $ \chan -> do
           void . throwIf0 "SDL.Mixer.queryAudio" "Mix_QuerySpec" $
@@ -371,7 +389,6 @@ closeAudio = SDL.Raw.Mixer.closeAudio
 -- Note that you must call 'withAudio' before using these, since they have to
 -- know the audio configuration to properly convert the data for playback.
 class Loadable a where
-
   -- | Load the value from a 'ByteString'.
   decode :: MonadIO m => ByteString -> m a
 
@@ -395,7 +412,6 @@ volumeToCInt = fromIntegral . max 0 . min 128
 
 -- | A class of all values that have a 'Volume'.
 class HasVolume a where
-
   -- | Gets the value's currently set 'Volume'.
   --
   -- If the value is a 'Channel' and 'AllChannels' is used, gets the /average/
@@ -432,14 +448,14 @@ instance Loadable Chunk where
   decode bytes = liftIO $ do
     unsafeUseAsCStringLen bytes $ \(cstr, len) -> do
       rw <- rwFromConstMem (castPtr cstr) (fromIntegral len)
-      fmap Chunk .
-        throwIfNull "SDL.Mixer.decode<Chunk>" "Mix_LoadWAV_RW" $
-          SDL.Raw.Mixer.loadWAV_RW rw 0
+      fmap Chunk
+        . throwIfNull "SDL.Mixer.decode<Chunk>" "Mix_LoadWAV_RW"
+        $ SDL.Raw.Mixer.loadWAV_RW rw 0
 
   free (Chunk p) = liftIO $ SDL.Raw.Mixer.freeChunk p
 
 instance HasVolume Chunk where
-  getVolume   (Chunk p) = fromIntegral <$> SDL.Raw.Mixer.volumeChunk p (-1)
+  getVolume (Chunk p) = fromIntegral <$> SDL.Raw.Mixer.volumeChunk p (-1)
   setVolume v (Chunk p) = void . SDL.Raw.Mixer.volumeChunk p $ volumeToCInt v
 
 -- | A mixing channel.
@@ -457,7 +473,7 @@ newtype Channel = Channel CInt deriving (Eq, Ord, Enum, Integral, Real, Num)
 instance Show Channel where
   show = \case
     AllChannels -> "AllChannels"
-    Channel c   -> "Channel " ++ show c
+    Channel c -> "Channel " ++ show c
 
 -- The lowest-numbered channel is CHANNEL_POST, or -2, for post processing
 -- effects. This function makes sure a channel is higher than CHANNEL_POST.
@@ -561,10 +577,16 @@ pattern NoLimit = -1
 -- This is the most generic play function variant.
 playLimit :: MonadIO m => Limit -> Channel -> Times -> Chunk -> m Channel
 playLimit l (Channel c) (Times t) (Chunk p) =
-  throwIfNeg "SDL.Mixer.playLimit" "Mix_PlayChannelTimed" 
-    (fromIntegral <$>
-      SDL.Raw.Mixer.playChannelTimed
-        (clipChan c) p (max (-1) $ t - 1) (fromIntegral l))
+  throwIfNeg
+    "SDL.Mixer.playLimit"
+    "Mix_PlayChannelTimed"
+    ( fromIntegral
+        <$> SDL.Raw.Mixer.playChannelTimed
+          (clipChan c)
+          p
+          (max (-1) $ t - 1)
+          (fromIntegral l)
+    )
 
 -- | Same as 'play', but fades in the 'Chunk' by making the 'Channel' 'Volume'
 -- start at 0 and rise to a full 128 over the course of a given number of
@@ -573,7 +595,7 @@ playLimit l (Channel c) (Times t) (Chunk p) =
 -- The 'Chunk' may end playing before the fade-in is complete, if it doesn't
 -- last as long as the given fade-in time.
 fadeIn :: MonadIO m => Milliseconds -> Chunk -> m ()
-fadeIn ms  = void . fadeInOn AllChannels Once ms
+fadeIn ms = void . fadeInOn AllChannels Once ms
 
 -- | Same as 'fadeIn', but allows you to specify the 'Channel' to play on and
 -- how many 'Times' to play it, similar to 'playOn'.
@@ -589,14 +611,23 @@ fadeInOn = fadeInLimit NoLimit
 -- can play, similar to 'playLimit'.
 --
 -- This is the most generic fade-in function variant.
-fadeInLimit
-  :: MonadIO m =>
-     Limit -> Channel -> Times -> Milliseconds -> Chunk -> m Channel
+fadeInLimit ::
+  MonadIO m =>
+  Limit ->
+  Channel ->
+  Times ->
+  Milliseconds ->
+  Chunk ->
+  m Channel
 fadeInLimit l (Channel c) (Times t) ms (Chunk p) =
   throwIfNeg "SDL.Mixer.fadeInLimit" "Mix_FadeInChannelTimed" $
-    fromIntegral <$>
-      SDL.Raw.Mixer.fadeInChannelTimed
-        (clipChan c) p (max (-1) $ t - 1) (fromIntegral ms) (fromIntegral l)
+    fromIntegral
+      <$> SDL.Raw.Mixer.fadeInChannelTimed
+        (clipChan c)
+        p
+        (max (-1) $ t - 1)
+        (fromIntegral ms)
+        (fromIntegral l)
 
 -- | Gradually fade out a given playing 'Channel' during the next
 -- 'Milliseconds', even if it is 'pause'd.
@@ -613,7 +644,7 @@ fadeOut ms (Channel c) =
 fadeOutGroup :: MonadIO m => Milliseconds -> Group -> m ()
 fadeOutGroup ms = \case
   DefaultGroup -> fadeOut ms AllChannels
-  Group g      -> void $ SDL.Raw.Mixer.fadeOutGroup g $ fromIntegral ms
+  Group g -> void $ SDL.Raw.Mixer.fadeOutGroup g $ fromIntegral ms
 
 -- | Pauses the given 'Channel', if it is actively playing.
 --
@@ -647,7 +678,7 @@ haltAfter ms (Channel c) =
 haltGroup :: MonadIO m => Group -> m ()
 haltGroup = \case
   DefaultGroup -> halt AllChannels
-  Group g      -> void $ SDL.Raw.Mixer.haltGroup $ max 0 g
+  Group g -> void $ SDL.Raw.Mixer.haltGroup $ max 0 g
 
 -- Quackery of the highest order! We keep track of a pointer we gave SDL_mixer,
 -- so we can free it at a later time. May the gods have mercy...
@@ -663,7 +694,6 @@ channelFinishedFunPtr = unsafePerformIO $ newIORef nullFunPtr
 -- __Note: don't call other 'SDL.Mixer' functions within this callback.__
 whenChannelFinished :: MonadIO m => (Channel -> IO ()) -> m ()
 whenChannelFinished callback = liftIO $ do
-
   -- Sets the callback.
   let callback' = callback . Channel
   callbackRaw <- SDL.Raw.Mixer.wrapChannelCallback callback'
@@ -704,8 +734,8 @@ data Fading = NoFading | FadingIn | FadingOut
 
 wordToFading :: SDL.Raw.Mixer.Fading -> Fading
 wordToFading = \case
-  SDL.Raw.Mixer.NO_FADING  -> NoFading
-  SDL.Raw.Mixer.FADING_IN  -> FadingIn
+  SDL.Raw.Mixer.NO_FADING -> NoFading
+  SDL.Raw.Mixer.FADING_IN -> FadingIn
   SDL.Raw.Mixer.FADING_OUT -> FadingOut
   _ -> error "SDL.Mixer.wordToFading: unknown Fading value."
 
@@ -743,15 +773,13 @@ group wrapped@(Group g) channel =
   case channel of
     AllChannels -> do
       total <- getChannels
-      if total > 0 then
-        (> 0) <$> groupSpan wrapped 0 (Channel $ fromIntegral $ total - 1)
-      else
-        return True -- No channels available -- still a success probably.
+      if total > 0
+        then (> 0) <$> groupSpan wrapped 0 (Channel $ fromIntegral $ total - 1)
+        else return True -- No channels available -- still a success probably.
     Channel c ->
-      if c >= 0 then
-        (== 1) <$> SDL.Raw.Mixer.groupChannel c g
-      else
-        return False -- Can't group the post-processing channel or below.
+      if c >= 0
+        then (== 1) <$> SDL.Raw.Mixer.groupChannel c g
+        else return False -- Can't group the post-processing channel or below.
 
 -- | Same as 'groupChannel', but groups all 'Channel's between the first and
 -- last given, inclusive.
@@ -767,8 +795,8 @@ group wrapped@(Group g) channel =
 groupSpan :: MonadIO m => Group -> Channel -> Channel -> m Int
 groupSpan wrap@(Group g) from@(Channel c1) to@(Channel c2)
   | c1 < 0 || c2 < 0 = return 0
-  | c1 > c2          = groupSpan wrap to from
-  | otherwise        = fromIntegral <$> SDL.Raw.Mixer.groupChannels c1 c2 g
+  | c1 > c2 = groupSpan wrap to from
+  | otherwise = fromIntegral <$> SDL.Raw.Mixer.groupChannels c1 c2 g
 
 -- | Returns the number of 'Channels' within a 'Group'.
 --
@@ -830,9 +858,9 @@ instance Loadable Music where
   decode bytes = liftIO $ do
     unsafeUseAsCStringLen bytes $ \(cstr, len) -> do
       rw <- rwFromConstMem (castPtr cstr) (fromIntegral len)
-      fmap Music .
-        throwIfNull "SDL.Mixer.decode<Music>" "Mix_LoadMUS_RW" $
-          SDL.Raw.Mixer.loadMUS_RW rw 0
+      fmap Music
+        . throwIfNull "SDL.Mixer.decode<Music>" "Mix_LoadMUS_RW"
+        $ SDL.Raw.Mixer.loadMUS_RW rw 0
 
   free (Music p) = liftIO $ SDL.Raw.Mixer.freeMusic p
 
@@ -935,7 +963,10 @@ fadeInMusicAt :: MonadIO m => Position -> Milliseconds -> Times -> Music -> m ()
 fadeInMusicAt at ms times (Music p) =
   throwIfNeg_ "SDL.Mixer.fadeInMusicAt" "Mix_FadeInMusicPos" $
     SDL.Raw.Mixer.fadeInMusicPos
-      p t' (fromIntegral ms) (realToFrac at / 1000.0)
+      p
+      t'
+      (fromIntegral ms)
+      (realToFrac at / 1000.0)
   where
     t' = case times of
       Forever -> (-1)
@@ -948,7 +979,10 @@ fadeInMusicAtMOD :: MonadIO m => Int -> Milliseconds -> Times -> Music -> m ()
 fadeInMusicAtMOD at ms times (Music p) =
   throwIfNeg_ "SDL.Mixer.fadeInMusicAtMOD" "Mix_FadeInMusicPos" $
     SDL.Raw.Mixer.fadeInMusicPos
-      p t' (fromIntegral ms) (realToFrac at)
+      p
+      t'
+      (fromIntegral ms)
+      (realToFrac at)
   where
     t' = case times of
       Forever -> (-1)
@@ -981,15 +1015,15 @@ data MusicType
 
 wordToMusicType :: SDL.Raw.Mixer.MusicType -> Maybe MusicType
 wordToMusicType = \case
-  SDL.Raw.Mixer.MUS_NONE    -> Nothing
-  SDL.Raw.Mixer.MUS_CMD     -> Just CMD
-  SDL.Raw.Mixer.MUS_WAV     -> Just WAV
-  SDL.Raw.Mixer.MUS_MOD     -> Just MOD
-  SDL.Raw.Mixer.MUS_MID     -> Just MID
-  SDL.Raw.Mixer.MUS_OGG     -> Just OGG
-  SDL.Raw.Mixer.MUS_MP3     -> Just MP3
-  SDL.Raw.Mixer.MUS_FLAC    -> Just FLAC
-  _                         -> Nothing
+  SDL.Raw.Mixer.MUS_NONE -> Nothing
+  SDL.Raw.Mixer.MUS_CMD -> Just CMD
+  SDL.Raw.Mixer.MUS_WAV -> Just WAV
+  SDL.Raw.Mixer.MUS_MOD -> Just MOD
+  SDL.Raw.Mixer.MUS_MID -> Just MID
+  SDL.Raw.Mixer.MUS_OGG -> Just OGG
+  SDL.Raw.Mixer.MUS_MP3 -> Just MP3
+  SDL.Raw.Mixer.MUS_FLAC -> Just FLAC
+  _ -> Nothing
 
 -- | Gets the 'MusicType' of a given 'Music'.
 musicType :: Music -> Maybe MusicType
@@ -1043,23 +1077,25 @@ pattern PostProcessing = SDL.Raw.Mixer.CHANNEL_POST
 -- __execute this returned action more than once.__
 effect :: MonadIO m => Channel -> EffectFinished -> Effect -> m (m ())
 effect (Channel channel) fin ef = do
+  ef' <- liftIO $
+    SDL.Raw.Mixer.wrapEffect $ \c p len _ -> do
+      fp <- castForeignPtr <$> newForeignPtr_ p
+      ef (Channel c) . unsafeFromForeignPtr0 fp $ fromIntegral len
 
-  ef' <- liftIO $ SDL.Raw.Mixer.wrapEffect $ \c p len _ -> do
-    fp <- castForeignPtr <$> newForeignPtr_ p
-    ef (Channel c) . unsafeFromForeignPtr0 fp $ fromIntegral len
-
-  fin' <- liftIO $ SDL.Raw.Mixer.wrapEffectFinished $ \c _ ->
-    fin $ Channel c
+  fin' <- liftIO $
+    SDL.Raw.Mixer.wrapEffectFinished $ \c _ ->
+      fin $ Channel c
 
   result <- SDL.Raw.Mixer.registerEffect channel ef' fin' nullPtr
 
-  if result == 0 then do
-    liftIO $ do
-      freeHaskellFunPtr ef' >> freeHaskellFunPtr fin'
-      err <- getError
-      throwIO $ SDLCallFailed "SDL.Raw.Mixer.addEffect" "Mix_RegisterEffect" err
-  else
-    return . liftIO $ do -- The unregister action.
+  if result == 0
+    then do
+      liftIO $ do
+        freeHaskellFunPtr ef' >> freeHaskellFunPtr fin'
+        err <- getError
+        throwIO $ SDLCallFailed "SDL.Raw.Mixer.addEffect" "Mix_RegisterEffect" err
+    else return . liftIO $ do
+      -- The unregister action.
       removed <- SDL.Raw.Mixer.unregisterEffect channel ef'
       freeHaskellFunPtr ef' >> freeHaskellFunPtr fin'
       when (removed == 0) $ do
@@ -1082,7 +1118,7 @@ effectPan channel@(Channel c) lVol rVol = do
   return . void $ effectPan channel 128 128
 
 wordVol :: Volume -> Word8
-wordVol = fromIntegral . min 255 . (*2) . volumeToCInt
+wordVol = fromIntegral . min 255 . (* 2) . volumeToCInt
 
 -- | Applies a different volume based on the distance (as 'Word8') specified.
 --

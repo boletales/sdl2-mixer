@@ -8,6 +8,7 @@ name:           sdl2-mixer
 version:        1.2.0
 synopsis:       Haskell bindings to SDL2_mixer
 category:       Sound, Foreign
+bug-reports:    https://gitlab.homotopic.tech/haskell/sdl2-mixer/issues
 author:         Vladimir Semyonov,
                 Siniša Biđin,
                 Daniel Firth
