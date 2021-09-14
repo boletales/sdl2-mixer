@@ -1,0 +1,108 @@
+name:                sdl2-mixer
+version:             1.2.0
+git:                 https://gitlab.homotopic.tech/haskell/sdl2-mixer
+license:             MIT
+author:
+- Vladimir Semyonov
+- Siniša Biđin
+- Daniel Firth
+maintainer:
+- Siniša Biđin <sinisa@bidin.eu>
+- Daniel Firth <dan.firth@homotopic.tech>
+copyright:
+- 2015 Vladimir Semyonov
+- 2015 Siniša Biđin
+- 2021 Daniel Firth
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+synopsis:            Haskell bindings to SDL2_mixer
+category:            Sound, Foreign
+
+dependencies:
+- base >= 4.9 && < 5
+- sdl2 >= 2.0.0
+
+library:
+  dependencies:
+  - bytestring >= 0.10.4.0
+  - data-default-class >= 0.0.1
+  - lifted-base >= 0.2
+  - monad-control >= 1.0
+  - template-haskell >= 2.10
+  - vector >= 0.10
+  source-dirs: src
+
+includes:
+  SDL_mixer.h
+
+extra-libraries:
+  SDL2_mixer
+
+c-sources:
+  cbits/helpers.c
+
+executables:
+  sdl2-mixer-basic:
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    source-dirs: examples/Basic
+    main: Main.hs
+    dependencies:
+    - data-default-class >= 0.0.1
+    - sdl2-mixer
+
+  sdl2-mixer-basic-raw:
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    source-dirs: examples/BasicRaw
+    main: Main.hs
+    dependencies:
+    - sdl2-mixer
+
+  sdl2-mixer-basic-jumbled:
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    source-dirs: examples/Jumbled
+    main: Main.hs
+    dependencies:
+    - sdl2-mixer
+    - data-default-class >= 0.0.1
+
+  sdl2-mixer-music:
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    source-dirs: examples/Music
+    main: Main.hs
+    dependencies:
+    - sdl2-mixer
+
+  sdl2-mixer-effect:
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    source-dirs: examples/Effect
+    main: Main.hs
+    dependencies:
+    - sdl2-mixer
+    - vector >= 0.10
+
+ghc-options:
+- -Weverything
+- -Wno-all-missed-specialisations 
+- -Wno-implicit-prelude
+- -Wno-missing-safe-haskell-mode
+- -Wno-prepositive-qualified-module
+- -Wno-safe
+- -Wno-unsafe
