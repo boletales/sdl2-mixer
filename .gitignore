@@ -6,3 +6,4 @@
 .stack-work
 /dist-newstyle
 .ghc.environment.*
+*.swp
