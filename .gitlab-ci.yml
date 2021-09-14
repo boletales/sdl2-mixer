@@ -1,0 +1,60 @@
+gitlab:
+  allow_failure: false
+  script:
+    - "dhall-to-yaml --file .gitlab-ci.dhall > .gitlab-ci.yml"
+    - |2
+       if [ -z $(git status --porcelain) ]; then
+         echo "GitLab CI file OK"
+       else
+         echo "GitLab CI file is bad, please regenerate it with dhall-to-yaml --file .gitlab-ci.dhall > .gitlab-ci.yml"
+         git --no-pager diff
+         exit 1
+       fi
+  stage: confirm
+  variables: {}
+hlint:
+  allow_failure: false
+  script:
+    - hlint .
+  stage: lint
+  variables: {}
+ormolu:
+  allow_failure: false
+  script:
+    - "find . -name \"*.hs\" | xargs -I x ormolu -i x"
+    - |2
+       if [ -z $(git status --porcelain) ]; then
+         echo "Ormolu Style Check OK"
+       else
+         echo "Haskell files are not styled properly, fix with find . -name "*.hs" | xargs -I x ormolu -i x."
+         git --no-pager diff
+         exit 1
+       fi
+  stage: lint
+  variables: {}
+stack-build:
+  allow_failure: false
+  script:
+    - "stack --nix build --ghc-options \"-Werror\""
+  stage: build
+  variables: {}
+stack-haddock:
+  allow_failure: false
+  script:
+    - stack --nix haddock
+  stage: docs
+  variables: {}
+stack-test:
+  allow_failure: false
+  script:
+    - "stack --nix test --ghc-options \"-Werror\""
+  stage: test
+  variables: {}
+stages:
+  - confirm
+  - lint
+  - build
+  - test
+  - docs
+variables:
+  GIT_SUBMODULE_STRATEGY: normal
