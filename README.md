@@ -3,11 +3,7 @@
 [![Hackage](https://img.shields.io/hackage/v/sdl2-mixer.svg)](https://hackage.haskell.org/package/sdl2-mixer)
 [![GitLab](https://gitlab.homotopic.tech/haskell/sdl2-mixer/badges/master/pipeline.svg)](https://gitlab.homotopic.tech/haskell/sdl2-mixer)
 
-Haskell bindings to SDL2_mixer
-
-Both the raw and the higher level bindings should allow you to use any aspect
-of the original SDL2_mixer library. Please report an issue if you encounter a
-bug or feel that something is missing.
+Haskell bindings to SDL2_mixer. Provides both raw and high level bindings.
 
 The
 [original SDL2_mixer documentation](http://www.libsdl.org/projects/SDL_mixer/docs/SDL_mixer.html)
