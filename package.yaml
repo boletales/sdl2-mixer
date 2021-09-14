@@ -35,14 +35,14 @@ library:
   - vector >= 0.10
   source-dirs: src
 
-includes:
-  SDL_mixer.h
+pkg-config-dependencies:
+- SDL2_mixer >= 2.0.0
 
 extra-libraries:
-  SDL2_mixer
+- SDL2_mixer
 
 c-sources:
-  cbits/helpers.c
+- cbits/helpers.c
 
 executables:
   sdl2-mixer-basic:
