@@ -1,5 +1,3 @@
-module Main where
-
 import Control.Monad (when)
 import qualified SDL
 import qualified SDL.Mixer as Mix
