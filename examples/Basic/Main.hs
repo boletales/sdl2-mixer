@@ -1,10 +1,9 @@
-import qualified SDL.Mixer as Mix
-import qualified SDL
-
-import Control.Monad      (when)
+import Control.Monad (when)
 import Data.Default.Class (def)
+import qualified SDL
+import qualified SDL.Mixer as Mix
 import System.Environment (getArgs)
-import System.Exit        (exitFailure)
+import System.Exit (exitFailure)
 
 main :: IO ()
 main = do
@@ -12,7 +11,7 @@ main = do
   fileName <- do
     args <- getArgs
     case args of
-      (arg:_) -> return arg
+      (arg : _) -> return arg
       _ -> do
         putStrLn "Usage: cabal run sdl2-mixer-basic <sound filename>"
         exitFailure
@@ -33,7 +32,7 @@ main = do
   -- wait until finished
   whileTrueM $ Mix.playing Mix.AllChannels
 
- -- free resources
+  -- free resources
   Mix.free sound
 
   -- close device
