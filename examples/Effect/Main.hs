@@ -1,11 +1,11 @@
-import Control.Monad (forM_, when)
-import Data.Int (Int16)
+import           Control.Monad                (forM_, when)
+import           Data.Int                     (Int16)
 import qualified Data.Vector.Storable.Mutable as MV
-import Data.Word (Word8)
+import           Data.Word                    (Word8)
 import qualified SDL
-import qualified SDL.Mixer as Mix
-import System.Environment (getArgs)
-import System.Exit (exitFailure)
+import qualified SDL.Mixer                    as Mix
+import           System.Environment           (getArgs)
+import           System.Exit                  (exitFailure)
 
 main :: IO ()
 main = do

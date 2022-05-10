@@ -1,12 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-monomorphism-restriction #-}
 
-import Control.Monad (unless, when)
-import Foreign.C.String (withCString)
-import Foreign.Ptr (nullPtr)
+import           Control.Monad      (unless, when)
+import           Foreign.C.String   (withCString)
+import           Foreign.Ptr        (nullPtr)
 import qualified SDL
-import qualified SDL.Raw.Mixer as Mix
-import System.Environment (getArgs)
-import System.Exit (exitFailure)
+import qualified SDL.Raw.Mixer      as Mix
+import           System.Environment (getArgs)
+import           System.Exit        (exitFailure)
 
 main :: IO ()
 main = do

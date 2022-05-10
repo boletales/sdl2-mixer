@@ -1,6 +1,6 @@
-{-# LANGUAGE BangPatterns #-}
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE BangPatterns    #-}
+{-# LANGUAGE CPP             #-}
+{-# LANGUAGE LambdaCase      #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 -- |
@@ -12,31 +12,19 @@
 -- inlined MonadIO variant. Use this to simplify the package's SDL.Raw.* modules.
 module SDL.Raw.Helper (liftF) where
 
-import Control.Monad (replicateM)
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Language.Haskell.TH
-  ( Body (NormalB),
-    Callconv (CCall),
-    Clause (Clause),
-    Dec (ForeignD, FunD, PragmaD, SigD),
-    Exp (AppE, VarE),
-    Foreign (ImportF),
-    Inline (Inline),
-    Name,
-    Pat (VarP),
-    Phases (AllPhases),
-    Pragma (InlineP),
-    Q,
-    RuleMatch (FunLike),
-    Safety (Safe),
-    TyVarBndr (PlainTV),
-    Type (AppT, ArrowT, ConT, ForallT, SigT, VarT),
-    mkName,
-    newName,
-#if MIN_VERSION_template_haskell(2,17,0)
-    Specificity(SpecifiedSpec)
-#endif
-  )
+import           Control.Monad          (replicateM)
+import           Control.Monad.IO.Class (MonadIO, liftIO)
+import           Language.Haskell.TH    (Body (NormalB), Callconv (CCall),
+                                         Clause (Clause),
+                                         Dec (ForeignD, FunD, PragmaD, SigD),
+                                         Exp (AppE, VarE), Foreign (ImportF),
+                                         Inline (Inline), Name, Pat (VarP),
+                                         Phases (AllPhases), Pragma (InlineP),
+                                         Q, RuleMatch (FunLike), Safety (Safe),
+                                         Specificity (SpecifiedSpec),
+                                         TyVarBndr (PlainTV),
+                                         Type (AppT, ArrowT, ConT, ForallT, SigT, VarT),
+                                         mkName, newName)
 
 -- | Given a name @fname@, a name of a C function @cname@ and the desired
 -- Haskell type @ftype@, this function generates:
@@ -57,7 +45,7 @@ liftF fname cname ftype = do
   -- Therefore, we include one. TODO: Can we get rid of this?
   sigd <- case args of
     [] -> ((: []) . SigD f) `fmap` liftType t'
-    _ -> return []
+    _  -> return []
 
   return $
     concat
@@ -82,9 +70,9 @@ countArgs = count 0
     count :: Num p => p -> Type -> p
     count !n = \case
       (AppT (AppT ArrowT _) t) -> count (n + 1) t
-      (ForallT _ _ t) -> count n t
-      (SigT t _) -> count n t
-      _ -> n
+      (ForallT _ _ t)          -> count n t
+      (SigT t _)               -> count n t
+      _                        -> n
 
 -- | An expression where f is applied to n arguments.
 applyTo :: Name -> [Exp] -> Exp

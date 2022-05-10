@@ -1,12 +1,12 @@
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE PatternSynonyms #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE PatternSynonyms            #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TypeFamilies               #-}
 
 -- |
 --
@@ -171,38 +171,36 @@ module SDL.Mixer
   )
 where
 
-import Control.Exception (throwIO)
-import Control.Exception.Lifted (finally)
-import Control.Monad (forM, void, when, (<=<), (>=>))
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Control.Monad.Trans.Control (MonadBaseControl)
-import Data.Bits ((.&.), (.|.))
-import Data.ByteString as BS (ByteString, readFile)
-import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.Default.Class (Default (def))
-import Data.IORef (IORef, newIORef, readIORef, writeIORef)
-import Data.Int (Int16)
-import Data.Vector.Storable.Mutable (IOVector, unsafeFromForeignPtr0)
-import Data.Word (Word8)
-import Foreign.C.String (peekCString)
-import Foreign.C.Types (CInt)
-import Foreign.ForeignPtr (castForeignPtr, newForeignPtr_)
-import Foreign.Marshal.Alloc (alloca)
-import Foreign.Ptr (FunPtr, Ptr, castPtr, freeHaskellFunPtr, nullFunPtr, nullPtr)
-import Foreign.Storable (Storable (peek))
-import SDL (SDLException (SDLCallFailed))
-import SDL.Internal.Exception
-  ( getError,
-    throwIf0,
-    throwIfNeg,
-    throwIfNeg_,
-    throwIfNull,
-    throwIf_,
-  )
+import           Control.Exception            (throwIO)
+import           Control.Exception.Lifted     (finally)
+import           Control.Monad                (forM, void, when, (<=<), (>=>))
+import           Control.Monad.IO.Class       (MonadIO, liftIO)
+import           Control.Monad.Trans.Control  (MonadBaseControl)
+import           Data.Bits                    ((.&.), (.|.))
+import           Data.ByteString              as BS (ByteString, readFile)
+import           Data.ByteString.Unsafe       (unsafeUseAsCStringLen)
+import           Data.Default.Class           (Default (def))
+import           Data.IORef                   (IORef, newIORef, readIORef,
+                                               writeIORef)
+import           Data.Int                     (Int16)
+import           Data.Vector.Storable.Mutable (IOVector, unsafeFromForeignPtr0)
+import           Data.Word                    (Word8)
+import           Foreign.C.String             (peekCString)
+import           Foreign.C.Types              (CInt)
+import           Foreign.ForeignPtr           (castForeignPtr, newForeignPtr_)
+import           Foreign.Marshal.Alloc        (alloca)
+import           Foreign.Ptr                  (FunPtr, Ptr, castPtr,
+                                               freeHaskellFunPtr, nullFunPtr,
+                                               nullPtr)
+import           Foreign.Storable             (Storable (peek))
+import           SDL                          (SDLException (SDLCallFailed))
+import           SDL.Internal.Exception       (getError, throwIf0, throwIfNeg,
+                                               throwIfNeg_, throwIfNull,
+                                               throwIf_)
 import qualified SDL.Raw
-import SDL.Raw.Filesystem (rwFromConstMem)
+import           SDL.Raw.Filesystem           (rwFromConstMem)
 import qualified SDL.Raw.Mixer
-import System.IO.Unsafe (unsafePerformIO)
+import           System.IO.Unsafe             (unsafePerformIO)
 
 -- | Initialize the library by loading support for a certain set of
 -- sample/music formats.
@@ -230,9 +228,9 @@ data InitFlag
 initToCInt :: InitFlag -> CInt
 initToCInt = \case
   InitFLAC -> SDL.Raw.Mixer.INIT_FLAC
-  InitMOD -> SDL.Raw.Mixer.INIT_MOD
-  InitMP3 -> SDL.Raw.Mixer.INIT_MP3
-  InitOGG -> SDL.Raw.Mixer.INIT_OGG
+  InitMOD  -> SDL.Raw.Mixer.INIT_MOD
+  InitMP3  -> SDL.Raw.Mixer.INIT_MP3
+  InitOGG  -> SDL.Raw.Mixer.INIT_OGG
 
 -- | Cleans up any loaded libraries, freeing memory.
 quit :: MonadIO m => m ()
@@ -275,9 +273,9 @@ data Audio = Audio
   { -- | A sampling frequency.
     audioFrequency :: Int,
     -- | An output sample format.
-    audioFormat :: Format,
+    audioFormat    :: Format,
     -- | 'Mono' or 'Stereo' output.
-    audioOutput :: Output
+    audioOutput    :: Output
   }
   deriving stock (Eq, Read, Show)
 
@@ -327,8 +325,8 @@ data Format
 
 formatToWord :: Format -> SDL.Raw.Mixer.Format
 formatToWord = \case
-  FormatU8 -> SDL.Raw.Mixer.AUDIO_U8
-  FormatS8 -> SDL.Raw.Mixer.AUDIO_S8
+  FormatU8      -> SDL.Raw.Mixer.AUDIO_U8
+  FormatS8      -> SDL.Raw.Mixer.AUDIO_S8
   FormatU16_LSB -> SDL.Raw.Mixer.AUDIO_U16LSB
   FormatS16_LSB -> SDL.Raw.Mixer.AUDIO_S16LSB
   FormatU16_MSB -> SDL.Raw.Mixer.AUDIO_U16MSB
@@ -338,15 +336,15 @@ formatToWord = \case
 
 wordToFormat :: SDL.Raw.Mixer.Format -> Format
 wordToFormat = \case
-  SDL.Raw.Mixer.AUDIO_U8 -> FormatU8
-  SDL.Raw.Mixer.AUDIO_S8 -> FormatS8
+  SDL.Raw.Mixer.AUDIO_U8     -> FormatU8
+  SDL.Raw.Mixer.AUDIO_S8     -> FormatS8
   SDL.Raw.Mixer.AUDIO_U16LSB -> FormatU16_LSB
   SDL.Raw.Mixer.AUDIO_S16LSB -> FormatS16_LSB
   SDL.Raw.Mixer.AUDIO_U16MSB -> FormatU16_MSB
   SDL.Raw.Mixer.AUDIO_S16MSB -> FormatS16_MSB
   SDL.Raw.Mixer.AUDIO_U16SYS -> FormatU16_Sys
   SDL.Raw.Mixer.AUDIO_S16SYS -> FormatS16_Sys
-  _ -> error "SDL.Mixer.wordToFormat: unknown Format."
+  _                          -> error "SDL.Mixer.wordToFormat: unknown Format."
 
 -- | The number of sound channels in output.
 data Output = Mono | Stereo
@@ -354,7 +352,7 @@ data Output = Mono | Stereo
 
 outputToCInt :: Output -> CInt
 outputToCInt = \case
-  Mono -> 1
+  Mono   -> 1
   Stereo -> 2
 
 cIntToOutput :: CInt -> Output
@@ -482,7 +480,7 @@ newtype Channel = Channel CInt
 instance Show Channel where
   show = \case
     AllChannels -> "AllChannels"
-    Channel c -> "Channel " ++ show c
+    Channel c   -> "Channel " ++ show c
 
 -- The lowest-numbered channel is CHANNEL_POST, or -2, for post processing
 -- effects. This function makes sure a channel is higher than CHANNEL_POST.
@@ -655,7 +653,7 @@ fadeOut ms (Channel c) =
 fadeOutGroup :: MonadIO m => Milliseconds -> Group -> m ()
 fadeOutGroup ms = \case
   DefaultGroup -> fadeOut ms AllChannels
-  Group g -> void $ SDL.Raw.Mixer.fadeOutGroup g $ fromIntegral ms
+  Group g      -> void $ SDL.Raw.Mixer.fadeOutGroup g $ fromIntegral ms
 
 -- | Pauses the given 'Channel', if it is actively playing.
 --
@@ -689,7 +687,7 @@ haltAfter ms (Channel c) =
 haltGroup :: MonadIO m => Group -> m ()
 haltGroup = \case
   DefaultGroup -> halt AllChannels
-  Group g -> void $ SDL.Raw.Mixer.haltGroup $ max 0 g
+  Group g      -> void $ SDL.Raw.Mixer.haltGroup $ max 0 g
 
 -- Quackery of the highest order! We keep track of a pointer we gave SDL_mixer,
 -- so we can free it at a later time. May the gods have mercy...
@@ -1030,14 +1028,14 @@ data MusicType
 wordToMusicType :: SDL.Raw.Mixer.MusicType -> Maybe MusicType
 wordToMusicType = \case
   SDL.Raw.Mixer.MUS_NONE -> Nothing
-  SDL.Raw.Mixer.MUS_CMD -> Just CMD
-  SDL.Raw.Mixer.MUS_WAV -> Just WAV
-  SDL.Raw.Mixer.MUS_MOD -> Just MOD
-  SDL.Raw.Mixer.MUS_MID -> Just MID
-  SDL.Raw.Mixer.MUS_OGG -> Just OGG
-  SDL.Raw.Mixer.MUS_MP3 -> Just MP3
+  SDL.Raw.Mixer.MUS_CMD  -> Just CMD
+  SDL.Raw.Mixer.MUS_WAV  -> Just WAV
+  SDL.Raw.Mixer.MUS_MOD  -> Just MOD
+  SDL.Raw.Mixer.MUS_MID  -> Just MID
+  SDL.Raw.Mixer.MUS_OGG  -> Just OGG
+  SDL.Raw.Mixer.MUS_MP3  -> Just MP3
   SDL.Raw.Mixer.MUS_FLAC -> Just FLAC
-  _ -> Nothing
+  _                      -> Nothing
 
 -- | Gets the 'MusicType' of a given 'Music'.
 musicType :: Music -> Maybe MusicType

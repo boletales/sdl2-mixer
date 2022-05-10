@@ -1,8 +1,8 @@
-import Control.Monad (when)
+import           Control.Monad      (when)
 import qualified SDL
-import qualified SDL.Mixer as Mix
-import System.Environment (getArgs)
-import System.Exit (exitFailure)
+import qualified SDL.Mixer          as Mix
+import           System.Environment (getArgs)
+import           System.Exit        (exitFailure)
 
 main :: IO ()
 main = do
