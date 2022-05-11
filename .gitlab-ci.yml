@@ -15,4 +15,4 @@ flake-ci:
     include:
       - artifact: flake-ci.yml
         job: generate-flake-ci
-    strategy: depends
+    strategy: depend
