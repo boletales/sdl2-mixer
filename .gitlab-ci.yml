@@ -4,7 +4,7 @@ stages:
 
 generate-flake-ci:
   stage: generate
-  script: ./.update-ci.sh > flake-ci.yml
+  script: nix run "git+https://gitlab.homotopic.tech/haskell/flake-to-gitlab-ci" > flake-ci.yml
   artifacts:
     paths:
       - flake-ci.yml
