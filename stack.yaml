@@ -1,4 +1,4 @@
-resolver: nightly-2022-04-20
+resolver: nightly-2022-08-16
 nix:
   enable: false
   packages: [pkg-config, SDL2, SDL2_mixer]
