@@ -1,38 +1,57 @@
 {
   description = "sdl2-mixer";
   inputs = {
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:hercules-ci/flake-parts";
+    };
     lint-utils.url = "git+https://gitlab.homotopic.tech/nix/lint-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    haskellNix.url = "github:input-output-hk/haskell.nix";
+    hs-techlab-platform.url = "git+https://gitlab.homotopic.tech/nix/hs-techlab-platform/ghc-9.4";
+    haskell-flake.url = "github:srid/haskell-flake";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   };
-  outputs = { self, nixpkgs, flake-utils, lint-utils, haskellNix }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
-      let
-        deferPluginErrors = true;
-        overlays = [
-          haskellNix.overlay
-          (final: prev: {
-            sdl2-mixer =
-              final.haskell-nix.project' {
-                src = ./.;
-                compiler-nix-name = "ghc922";
-                projectFileName = "stack.yaml";
-                modules = [{
-                  reinstallableLibGhc = true;
-                }];
-              };
-          })
-        ];
-        pkgs = import nixpkgs { inherit system overlays; inherit (haskellNix) config; };
-        flake = pkgs.sdl2-mixer.flake { };
-      in
-      flake // {
-        defaultPackage = flake.packages."sdl2-mixer:lib:sdl2-mixer";
-        checks = {
-          hlint = lint-utils.linters.${system}.hlint ./.;
-          hpack = lint-utils.linters.${system}.hpack ./.;
-          stylish-haskell = lint-utils.linters.${system}.stylish-haskell ./.;
+  outputs =
+    inputs@{ self
+    , flake-parts
+    , haskell-flake
+    , hs-techlab-platform
+    , lint-utils
+    , nixpkgs
+    , ...
+    }:
+    flake-parts.lib.mkFlake { inherit self; } {
+      systems = [ "x86_64-linux" ];
+      imports = [
+        haskell-flake.flakeModule
+      ];
+      perSystem = { config, pkgs, system, ... }: {
+        haskellProjects = {
+          sdl2-mixer = {
+            root = ./.;
+            haskellPackages = pkgs.haskell.packages.ghc941;
+            buildTools = hp: {
+              cabal-doctest = null;
+              cabal-install = null;
+              ghcid = null;
+              haskell-language-server = null;
+              hedgehog = null;
+              hlint = null;
+              hoogle = null;
+              hoogle-with-packages = null;
+              warp = null;
+            };
+            source-overrides = { };
+            overrides = hs-techlab-platform.overlays.${system}.default;
+          };
         };
-      });
+        devShells.default = config.devShells.sdl2-mixer;
+        packages.default = config.packages.sdl2-mixer;
+        checks = {
+          hlint = lint-utils.outputs.linters.${system}.hlint self;
+          hpack = lint-utils.outputs.linters.${system}.hpack self;
+          nixpkgs-fmt = lint-utils.outputs.linters.${system}.nixpkgs-fmt self;
+          stylish-haskell = lint-utils.outputs.linters.${system}.stylish-haskell self;
+        };
+      };
+    };
 }
