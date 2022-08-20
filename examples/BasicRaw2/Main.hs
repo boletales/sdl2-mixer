@@ -1,7 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-monomorphism-restriction #-}
 
 import           Control.Monad      (unless, when)
-import Control.Concurrent
 import           Foreign.C.String   (withCString)
 import           Foreign.Ptr        (nullPtr)
 import qualified SDL
@@ -41,16 +40,17 @@ main = do
   assert $ sound2 /= nullPtr
 
   -- play file
-  channel <- Mix.playChannel 0 sound 0
+  channel1 <- Mix.playChannel 0 sound 0
 
-  threadDelay 1000000
+  threadDelay 100000
 
   channel2 <- Mix.playChannel 1 sound2 0
 
-  assert $ channel /= -1
+  assert $ channel1 /= -1
 
   -- wait until finished
-  whileTrueM $ (/= 0) <$> Mix.playing channel
+  whileTrueM $ (/= 0) <$> Mix.playing channel1
+  whileTrueM $ (/= 0) <$> Mix.playing channel2
 
   -- free resources
   Mix.freeChunk sound
