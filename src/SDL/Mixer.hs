@@ -6,6 +6,7 @@
 {-# LANGUAGE PatternSynonyms            #-}
 {-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE StandaloneKindSignatures   #-}
 {-# LANGUAGE TypeFamilies               #-}
 
 -- |
@@ -180,6 +181,7 @@ import           Data.Bits                    ((.&.), (.|.))
 import           Data.ByteString              as BS (ByteString, readFile)
 import           Data.ByteString.Unsafe       (unsafeUseAsCStringLen)
 import           Data.Default.Class           (Default (def))
+import           Data.Kind                    (Constraint, Type)
 import           Data.IORef                   (IORef, newIORef, readIORef,
                                                writeIORef)
 import           Data.Int                     (Int16)
@@ -218,6 +220,7 @@ initialize flags = do
 
 -- | Used with 'initialize' to designate loading support for a particular
 -- sample/music format.
+type InitFlag :: Type
 data InitFlag
   = InitFLAC
   | InitMOD
@@ -269,6 +272,7 @@ openAudio Audio {..} chunkSize =
       (fromIntegral chunkSize)
 
 -- | An audio configuration. Use this with 'withAudio'.
+type Audio :: Type
 data Audio = Audio
   { -- | A sampling frequency.
     audioFrequency :: Int,
@@ -301,9 +305,11 @@ defaultAudio = def
 -- The smaller this is, the more often callbacks will be invoked. If this is
 -- made too small on a slow system, the sounds may skip. If made too large,
 -- sound effects could lag.
+type ChunkSize :: Type
 type ChunkSize = Int
 
 -- | A sample format.
+type Format :: Type
 data Format
   = -- | Unsigned 8-bit samples.
     FormatU8
@@ -347,6 +353,7 @@ wordToFormat = \case
   _                          -> error "SDL.Mixer.wordToFormat: unknown Format."
 
 -- | The number of sound channels in output.
+type Output :: Type
 data Output = Mono | Stereo
   deriving stock (Eq, Ord, Bounded, Read, Show)
 
@@ -392,6 +399,7 @@ closeAudio = SDL.Raw.Mixer.closeAudio
 --
 -- Note that you must call 'withAudio' before using these, since they have to
 -- know the audio configuration to properly convert the data for playback.
+type Loadable :: Type -> Constraint
 class Loadable a where
   -- | Load the value from a 'ByteString'.
   decode :: MonadIO m => ByteString -> m a
@@ -409,12 +417,14 @@ class Loadable a where
 --
 -- 'Volume's lesser than 0 or greater than 128 function as if they are 0 and
 -- 128, respectively.
+type Volume :: Type
 type Volume = Int
 
 volumeToCInt :: Volume -> CInt
 volumeToCInt = fromIntegral . max 0 . min 128
 
 -- | A class of all values that have a 'Volume'.
+type HasVolume :: Type -> Constraint
 class HasVolume a where
   -- | Gets the value's currently set 'Volume'.
   --
@@ -446,6 +456,7 @@ chunkDecoders =
     forM [0 .. num - 1] $ SDL.Raw.Mixer.getChunkDecoder >=> peekCString
 
 -- | A loaded audio chunk.
+type Chunk :: Type
 newtype Chunk = Chunk (Ptr SDL.Raw.Mixer.Chunk)
   deriving stock (Eq, Show)
 
@@ -473,6 +484,7 @@ instance HasVolume Chunk where
 -- 'setChannels'.
 --
 -- The starting 'Volume' of each 'Channel' is the maximum: 128.
+type Channel :: Type
 newtype Channel = Channel CInt
   deriving stock (Eq, Ord)
   deriving newtype (Enum, Integral, Real, Num)
@@ -546,6 +558,7 @@ playForever :: MonadIO m => Chunk -> m ()
 playForever = void . playOn (-1) Forever
 
 -- | How many times should a certain 'Chunk' be played?
+type Times :: Type
 newtype Times = Times CInt
   deriving stock (Eq, Ord)
   deriving newtype (Enum, Integral, Real, Num)
@@ -569,9 +582,11 @@ playOn :: MonadIO m => Channel -> Times -> Chunk -> m Channel
 playOn = playLimit NoLimit
 
 -- | A time in milliseconds.
+type Milliseconds :: Type
 type Milliseconds = Int
 
 -- | An upper limit of time, in milliseconds.
+type Limit :: Type
 type Limit = Milliseconds
 
 -- | A lack of an upper limit.
@@ -738,6 +753,7 @@ pausedCount :: MonadIO m => m Int
 pausedCount = fromIntegral <$> SDL.Raw.Mixer.paused (-1)
 
 -- | Describes whether a 'Channel' is fading in, out, or not at all.
+type Fading :: Type
 data Fading = NoFading | FadingIn | FadingOut
   deriving stock (Eq, Ord, Show, Read)
 
@@ -762,6 +778,7 @@ fading (Channel c) =
 -- them at once.
 --
 -- By default, all 'Channel's are members of the 'DefaultGroup'.
+type Group :: Type
 newtype Group = Group CInt
   deriving stock (Eq, Ord)
   deriving newtype (Enum, Integral, Real, Num)
@@ -863,6 +880,7 @@ musicDecoders =
 --
 -- To manipulate 'Music' outside of post-processing callbacks, use the music
 -- variant functions listed below.
+type Music :: Type
 newtype Music = Music (Ptr SDL.Raw.Mixer.Music)
   deriving stock (Eq, Show)
 
@@ -949,6 +967,7 @@ fadeOutMusic :: MonadIO m => Milliseconds -> m Bool
 fadeOutMusic = fmap (== 1) . SDL.Raw.Mixer.fadeOutMusic . fromIntegral
 
 -- | A position in milliseconds within a piece of 'Music'.
+type Position :: Type
 type Position = Milliseconds
 
 -- | Set the 'Position' for currently playing 'Music'.
@@ -1015,6 +1034,7 @@ setMusicVolume :: MonadIO m => Volume -> m ()
 setMusicVolume v = void . SDL.Raw.Mixer.volumeMusic $ volumeToCInt v
 
 -- | A `Music`'s type.
+type MusicType :: Type
 data MusicType
   = CMD
   | WAV
@@ -1067,11 +1087,13 @@ whenMusicFinished callback = liftIO $ do
 -- __Note that, at the moment, this is a stream of bytes. Depending on the__
 -- __'Audio' 'Format' you're using, you're probably going to want to treat is__
 -- __as a stream of 16-bit values instead.__
+type Effect :: Type
 type Effect = Channel -> IOVector Word8 -> IO () -- TODO: Don't hardcode Word8.
 
 -- | A function called when a processor is finished being used.
 --
 -- This allows you to clean up any state you might have had.
+type EffectFinished :: Type
 type EffectFinished = Channel -> IO ()
 
 -- | A way to refer to the special 'Channel' used for post-processing effects.
