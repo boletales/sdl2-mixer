@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-monomorphism-restriction #-}
 
+import           Control.Concurrent (threadDelay)
 import           Control.Monad      (unless, when)
 import           Foreign.C.String   (withCString)
 import           Foreign.Ptr        (nullPtr)
