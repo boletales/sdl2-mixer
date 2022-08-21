@@ -164,6 +164,7 @@ module SDL.Mixer
     effectPosition,
     effectReverseStereo,
 
+    setPostMix,
     -- * Other
     initialize,
     InitFlag (..),
@@ -1136,6 +1137,18 @@ effect (Channel channel) fin ef = do
         err <- getError
         throwIO $
           SDLCallFailed "SDL.Raw.Mixer.removeEffect" "Mix_UnregisterEffect" err
+
+type PostMix :: Type
+type PostMix = IOVector Word8 -> IO ()
+
+setPostMix :: MonadIO m => PostMix -> m ()
+setPostMix f = do
+  f' <- liftIO $
+    SDL.Raw.Mixer.wrapPostMix $ \x p len -> do
+      fp <- castForeignPtr <$> newForeignPtr_ p
+      f . unsafeFromForeignPtr0 fp $ fromIntegral len
+
+  SDL.Raw.Mixer.setPostMix f' nullPtr
 
 -- | Applies an in-built effect implementing panning.
 --

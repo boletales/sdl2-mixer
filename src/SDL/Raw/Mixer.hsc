@@ -151,6 +151,7 @@ module SDL.Raw.Mixer
   , unregisterEffect
   , unregisterAllEffects
   , PostMix
+  , wrapPostMix
   , setPostMix
   , setPanning
   , setDistance
@@ -559,6 +560,9 @@ liftF "unregisterAllEffects" "Mix_UnregisterAllEffects"
 
 type PostMix :: Type
 type PostMix = Ptr () -> Ptr Word8 -> CInt -> IO ()
+
+foreign import ccall "wrapper"
+  wrapPostMix :: PostMix -> IO (FunPtr PostMix)
 
 liftF "setPostMix" "Mix_SetPostMix"
   [t|FunPtr PostMix -> Ptr () -> IO ()|]
