@@ -150,6 +150,7 @@ module SDL.Raw.Mixer
   , pattern CHANNEL_POST
   , unregisterEffect
   , unregisterAllEffects
+  , PostMix
   , setPostMix
   , setPanning
   , setDistance
@@ -556,8 +557,11 @@ liftF "unregisterEffect" "Mix_UnregisterEffect"
 liftF "unregisterAllEffects" "Mix_UnregisterAllEffects"
   [t|Channel -> IO CInt|]
 
+type PostMix :: Type
+type PostMix = Ptr () -> Ptr Word8 -> CInt -> IO ()
+
 liftF "setPostMix" "Mix_SetPostMix"
-  [t|FunPtr (Ptr () -> Ptr Word8 -> CInt -> IO ()) -> Ptr () -> IO ()|]
+  [t|FunPtr PostMix -> Ptr () -> IO ()|]
 
 liftF "setPanning" "Mix_SetPanning"
   [t|Channel -> Word8 -> Word8 -> IO CInt|]
