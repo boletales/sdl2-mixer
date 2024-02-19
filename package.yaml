@@ -53,9 +53,15 @@ executables:
     - -with-rtsopts=-N
     source-dirs: examples/Basic
     main: Main.hs
-    dependencies:
-    - data-default-class >= 0.0.1
-    - sdl2-mixer
+    when:
+    - condition: 'flag(example)'
+      then:
+        dependencies:
+        - data-default-class >= 0.0.1
+        - sdl2-mixer
+      else:
+        buildable: false
+
 
   sdl2-mixer-basic-raw:
     ghc-options:
@@ -64,8 +70,13 @@ executables:
     - -with-rtsopts=-N
     source-dirs: examples/BasicRaw
     main: Main.hs
-    dependencies:
-    - sdl2-mixer
+    when:
+    - condition: 'flag(example)'
+      then:
+        dependencies:
+        - sdl2-mixer
+      else:
+        buildable: false
 
   sdl2-mixer-basic-raw-2:
     ghc-options:
@@ -74,8 +85,13 @@ executables:
     - -with-rtsopts=-N
     source-dirs: examples/BasicRaw2
     main: Main.hs
-    dependencies:
-    - sdl2-mixer
+    when:
+    - condition: 'flag(example)'
+      then:
+        dependencies:
+        - sdl2-mixer
+      else:
+        buildable: false
 
   sdl2-mixer-basic-jumbled:
     ghc-options:
@@ -84,9 +100,14 @@ executables:
     - -with-rtsopts=-N
     source-dirs: examples/Jumbled
     main: Main.hs
-    dependencies:
-    - sdl2-mixer
-    - data-default-class >= 0.0.1
+    when:
+    - condition: 'flag(example)'
+      then:
+        dependencies:
+        - data-default-class >= 0.0.1
+        - sdl2-mixer
+      else:
+        buildable: false
 
   sdl2-mixer-music:
     ghc-options:
@@ -95,8 +116,13 @@ executables:
     - -with-rtsopts=-N
     source-dirs: examples/Music
     main: Main.hs
-    dependencies:
-    - sdl2-mixer
+    when:
+    - condition: 'flag(example)'
+      then:
+        dependencies:
+        - sdl2-mixer
+      else:
+        buildable: false
 
   sdl2-mixer-effect:
     ghc-options:
@@ -105,9 +131,14 @@ executables:
     - -with-rtsopts=-N
     source-dirs: examples/Effect
     main: Main.hs
-    dependencies:
-    - sdl2-mixer
-    - vector >= 0.10
+    when:
+    - condition: 'flag(example)'
+      then:
+        dependencies:
+        - sdl2-mixer
+        - vector >= 0.10
+      else:
+        buildable: false
 
 ghc-options:
 - -Weverything
@@ -117,3 +148,9 @@ ghc-options:
 - -Wno-prepositive-qualified-module
 - -Wno-safe
 - -Wno-unsafe
+
+flags:
+  example:
+    manual: True
+    description: Build the example executables
+    default: False
