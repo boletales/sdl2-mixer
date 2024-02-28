@@ -35,13 +35,11 @@ library:
   - template-haskell >= 2.10
   - vector >= 0.10
   source-dirs: src
-
-pkg-config-dependencies:
-- SDL2_mixer >= 2.0.0
+  pkg-config-dependencies:
+  - SDL2_mixer >= 2.0.0
 
 extra-libraries:
 - SDL2_mixer
-
 c-sources:
 - cbits/helpers.c
 

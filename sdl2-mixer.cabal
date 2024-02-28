@@ -1,6 +1,6 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.34.7.
+-- This file has been generated from package.yaml by hpack version 0.36.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -70,8 +70,6 @@ executable sdl2-mixer-basic
       cbits/helpers.c
   extra-libraries:
       SDL2_mixer
-  pkgconfig-depends:
-      SDL2_mixer >= 2.0.0
   build-depends:
       base >=4.9 && <5
     , data-default-class >=0.0.1
@@ -92,8 +90,6 @@ executable sdl2-mixer-basic-jumbled
       cbits/helpers.c
   extra-libraries:
       SDL2_mixer
-  pkgconfig-depends:
-      SDL2_mixer >= 2.0.0
   build-depends:
       base >=4.9 && <5
     , data-default-class >=0.0.1
@@ -114,8 +110,6 @@ executable sdl2-mixer-basic-raw
       cbits/helpers.c
   extra-libraries:
       SDL2_mixer
-  pkgconfig-depends:
-      SDL2_mixer >= 2.0.0
   build-depends:
       base >=4.9 && <5
     , sdl2 >=2.0.0
@@ -135,8 +129,6 @@ executable sdl2-mixer-basic-raw-2
       cbits/helpers.c
   extra-libraries:
       SDL2_mixer
-  pkgconfig-depends:
-      SDL2_mixer >= 2.0.0
   build-depends:
       base >=4.9 && <5
     , sdl2 >=2.0.0
@@ -156,8 +148,6 @@ executable sdl2-mixer-effect
       cbits/helpers.c
   extra-libraries:
       SDL2_mixer
-  pkgconfig-depends:
-      SDL2_mixer >= 2.0.0
   build-depends:
       base >=4.9 && <5
     , sdl2 >=2.0.0
@@ -178,8 +168,6 @@ executable sdl2-mixer-music
       cbits/helpers.c
   extra-libraries:
       SDL2_mixer
-  pkgconfig-depends:
-      SDL2_mixer >= 2.0.0
   build-depends:
       base >=4.9 && <5
     , sdl2 >=2.0.0
